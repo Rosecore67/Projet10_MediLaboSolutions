@@ -1,33 +1,54 @@
-﻿using BackPatient.Data;
-using BackPatient.Models;
+﻿using BackPatient.Models;
+using BackPatient.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BackPatient.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PatientController : ControllerBase
+    public class PatientsController : ControllerBase
     {
-        private readonly PatientDbContext _context;
+        private readonly IPatientService _service;
 
-        public PatientController(PatientDbContext context)
+        public PatientsController(IPatientService service)
         {
-            _context = context;
+            _service = service;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Patient>>> GetPatients()
         {
-            return await _context.Patients.ToListAsync();
+            return Ok(await _service.GetAllPatients());
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Patient>> GetPatient(int id)
+        {
+            var patient = await _service.GetPatientById(id);
+            if (patient == null) return NotFound();
+            return Ok(patient);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Patient>> PostPatient(Patient patient)
+        public async Task<ActionResult> PostPatient(Patient patient)
         {
-            _context.Patients.Add(patient);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetPatients), new { id = patient.Id }, patient);
+            await _service.AddPatient(patient);
+            return CreatedAtAction(nameof(GetPatient), new { id = patient.Id }, patient);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutPatient(int id, Patient patient)
+        {
+            if (id != patient.Id) return BadRequest();
+            await _service.UpdatePatient(patient);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePatient(int id)
+        {
+            await _service.DeletePatient(id);
+            return NoContent();
         }
     }
 }
