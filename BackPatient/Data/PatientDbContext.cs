@@ -8,5 +8,15 @@ namespace BackPatient.Data
     {
         public PatientDbContext(DbContextOptions<PatientDbContext> options) : base(options) { }
         public DbSet<Patient> Patients { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Patient>()
+                .HasKey(p => p.Id);
+
+            modelBuilder.Entity<Patient>()
+                .Property(p => p.Id)
+                .ValueGeneratedOnAdd();
+        }
     }
 }
