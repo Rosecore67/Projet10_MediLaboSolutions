@@ -17,6 +17,10 @@ namespace BackPatient.Data
             modelBuilder.Entity<Patient>()
                 .Property(p => p.Id)
                 .ValueGeneratedOnAdd();
+
+            modelBuilder.Entity<Patient>()
+                .Property(p => p.DateNaissance)
+                .HasColumnType("DATE");
         }
     }
 }

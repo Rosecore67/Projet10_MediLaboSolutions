@@ -1,4 +1,5 @@
 ﻿using BackPatient.Models;
+using BackPatient.Models.DTOs;
 using BackPatient.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,17 +31,41 @@ namespace BackPatient.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> PostPatient(Patient patient)
+        public async Task<ActionResult<Patient>> PostPatient(PatientCreateDto patientDto)
         {
+            var patient = new Patient
+            {
+                Nom = patientDto.Nom,
+                Prenom = patientDto.Prenom,
+                DateNaissance = patientDto.DateNaissance,
+                Genre = patientDto.Genre,
+                Adresse = patientDto.Adresse,
+                Telephone = patientDto.Telephone
+            };
+
             await _service.AddPatient(patient);
+
             return CreatedAtAction(nameof(GetPatient), new { id = patient.Id }, patient);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPatient(int id, Patient patient)
+        public async Task<IActionResult> PutPatient(int id, PatientUpdateDto patientDto)
         {
-            if (id != patient.Id) return BadRequest();
-            await _service.UpdatePatient(patient);
+            var existingPatient = await _service.GetPatientById(id);
+            if (existingPatient == null)
+            {
+                return NotFound("Le patient n'existe pas.");
+            }
+
+            existingPatient.Nom = patientDto.Nom;
+            existingPatient.Prenom = patientDto.Prenom;
+            existingPatient.DateNaissance = patientDto.DateNaissance;
+            existingPatient.Genre = patientDto.Genre;
+            existingPatient.Adresse = patientDto.Adresse;
+            existingPatient.Telephone = patientDto.Telephone;
+
+            await _service.UpdatePatient(existingPatient);
+
             return NoContent();
         }
 
