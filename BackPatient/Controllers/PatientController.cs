@@ -16,7 +16,7 @@ namespace BackPatient.Controllers
             _service = service;
         }
 
-        [HttpGet]
+        [HttpGet("list")]
         public async Task<ActionResult<IEnumerable<Patient>>> GetPatients()
         {
             return Ok(await _service.GetAllPatients());
@@ -30,7 +30,7 @@ namespace BackPatient.Controllers
             return Ok(patient);
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<ActionResult<Patient>> PostPatient(PatientCreateDto patientDto)
         {
             var patient = new Patient
@@ -48,7 +48,7 @@ namespace BackPatient.Controllers
             return CreatedAtAction(nameof(GetPatient), new { id = patient.Id }, patient);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<IActionResult> PutPatient(int id, PatientUpdateDto patientDto)
         {
             var existingPatient = await _service.GetPatientById(id);
@@ -69,7 +69,7 @@ namespace BackPatient.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeletePatient(int id)
         {
             await _service.DeletePatient(id);
