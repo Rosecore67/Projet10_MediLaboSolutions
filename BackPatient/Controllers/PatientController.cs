@@ -16,13 +16,13 @@ namespace BackPatient.Controllers
             _service = service;
         }
 
-        [HttpGet("listPatient")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Patient>>> GetPatients()
         {
             return Ok(await _service.GetAllPatients());
         }
 
-        [HttpGet("patient/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Patient>> GetPatient(int id)
         {
             var patient = await _service.GetPatientById(id);

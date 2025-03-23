@@ -1,0 +1,15 @@
+﻿@model PatientEditViewModel
+
+<h2>Modifier le Patient</h2>
+<form asp-action="Edit">
+    <input type="hidden" asp-for="Id" />
+    <label>Nom :</label> <input asp-for="Nom" class="form-control" />
+    <label>Prénom :</label> <input asp-for="Prenom" class="form-control" />
+    <label>Date de Naissance :</label> <input asp-for="DateNaissance" type="date" class="form-control" />
+    <label>Genre :</label> <input asp-for="Genre" class="form-control" />
+    <label>Adresse :</label> <input asp-for="Adresse" class="form-control" />
+    <label>Téléphone :</label> <input asp-for="Telephone" class="form-control" />
+
+    <button type="submit" class="btn btn-primary">Modifier</button>
+</form>
+<a asp-action="Index">Retour</a>

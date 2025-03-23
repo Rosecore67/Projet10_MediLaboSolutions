@@ -1,0 +1,12 @@
+﻿@model PatientDetailsViewModel
+
+<h2>Détails du Patient</h2>
+<table class="table">
+    <tr><th>Nom</th><td>@Model.Nom</td></tr>
+    <tr><th>Prénom</th><td>@Model.Prenom</td></tr>
+    <tr><th>Date de Naissance</th><td>@Model.DateNaissance.ToShortDateString()</td></tr>
+    <tr><th>Genre</th><td>@Model.Genre</td></tr>
+    <tr><th>Adresse</th><td>@Model.Adresse</td></tr>
+    <tr><th>Téléphone</th><td>@Model.Telephone</td></tr>
+</table>
+<a asp-action="Index">Retour à la liste</a>

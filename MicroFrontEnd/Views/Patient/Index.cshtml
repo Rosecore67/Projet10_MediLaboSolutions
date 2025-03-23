@@ -19,6 +19,13 @@
                 <td>@patient.Prenom</td>
                 <td>@patient.DateNaissance.ToString("dd/MM/yyyy")</td>
                 <td>@patient.Genre</td>
+                <td><a asp-action="Details" asp-route-id="@patient.Id">Voir Détails</a></td>
+                <td><a asp-action="Edit" asp-route-id="@patient.Id">Modifier</a></td>
+                <td>
+                    <form asp-action="Delete" asp-route-id="@patient.Id" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce patient ?');">
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>
