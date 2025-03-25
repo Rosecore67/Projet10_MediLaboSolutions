@@ -6,5 +6,5 @@ builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange
 builder.Services.AddOcelot();
 
 var app = builder.Build();
-app.UseOcelot().Wait();
+await app.UseOcelot();
 app.Run();

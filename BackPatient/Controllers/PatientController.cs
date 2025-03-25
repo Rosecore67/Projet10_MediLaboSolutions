@@ -7,14 +7,9 @@ namespace BackPatient.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PatientsController : ControllerBase
+    public class PatientsController(IPatientService service) : ControllerBase
     {
-        private readonly IPatientService _service;
-
-        public PatientsController(IPatientService service)
-        {
-            _service = service;
-        }
+        private readonly IPatientService _service = service;
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Patient>>> GetPatients()

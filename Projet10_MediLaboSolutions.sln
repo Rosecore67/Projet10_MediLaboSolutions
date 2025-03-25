@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroFrontEnd", "MicroFront
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoteService", "NoteService\NoteService.csproj", "{DACCFF8A-C16F-4A96-B299-5C68F7CAD2A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GatewayAPI", "Gateway\GatewayAPI.csproj", "{831206E8-8C63-4816-9479-E8E61AED3ED9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GatewayAPI", "Gateway\GatewayAPI.csproj", "{C3E69B50-D809-4643-BC45-66C19949919C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{DACCFF8A-C16F-4A96-B299-5C68F7CAD2A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DACCFF8A-C16F-4A96-B299-5C68F7CAD2A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DACCFF8A-C16F-4A96-B299-5C68F7CAD2A6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{831206E8-8C63-4816-9479-E8E61AED3ED9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{831206E8-8C63-4816-9479-E8E61AED3ED9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{831206E8-8C63-4816-9479-E8E61AED3ED9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{831206E8-8C63-4816-9479-E8E61AED3ED9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3E69B50-D809-4643-BC45-66C19949919C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3E69B50-D809-4643-BC45-66C19949919C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3E69B50-D809-4643-BC45-66C19949919C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3E69B50-D809-4643-BC45-66C19949919C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
