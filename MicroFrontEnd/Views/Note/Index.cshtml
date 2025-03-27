@@ -1,0 +1,22 @@
+﻿@model List<(MicroFrontEnd.Models.DTOs.NoteDTO, string)>
+
+<h2>Liste des Notes</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Patient</th>
+            <th>Date</th>
+            <th>Contenu</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var (note, patientName) in Model)
+        {
+            <tr>
+                <td>@patientName</td>
+                <td>@note.Date.ToShortDateString()</td>
+                <td>@note.Content</td>
+            </tr>
+        }
+    </tbody>
+</table>

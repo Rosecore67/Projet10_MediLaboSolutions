@@ -15,6 +15,14 @@ namespace NoteService.Controllers
             _noteService = noteService;
         }
 
+        // GET: api/notes
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<NoteReadDTO>>> GetAllNotes()
+        {
+            var notes = await _noteService.GetAllNotesAsync();
+            return Ok(notes);
+        }
+
         // GET: api/notes/{patientId}
         [HttpGet("{patientId}")]
         public async Task<ActionResult<IEnumerable<NoteReadDTO>>> GetNotesByPatient(int patientId)

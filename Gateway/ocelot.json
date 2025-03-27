@@ -1,5 +1,6 @@
 {
   "Routes": [
+    // Route BackPatient API
     {
       "DownstreamPathTemplate": "/api/patients",
       "DownstreamScheme": "https",
@@ -11,7 +12,35 @@
       ],
       "UpstreamPathTemplate": "/api/patients",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/patients/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7011
+        }
+      ],
+      "UpstreamPathTemplate": "/api/patients/{id}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ]
+    },
+
+    //Route Notes Medecins
+    {
+      "DownstreamPathTemplate": "/api/notes",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7249
+        }
+      ],
+      "UpstreamPathTemplate": "/api/notes",
+      "UpstreamHttpMethod": [ "GET" ,"POST", "PUT" ]
     }
+    
   ],
   "GlobalConfiguration": {
     "BaseUrl": "http://localhost:6000"

@@ -1,8 +1,41 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Accueil";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Bienvenue sur MédiLabo Solutions</h1>
+    <p class="lead mt-3">
+        Cette application vous permet de gérer les patients et les notes médicales associées.
+        Elle est conçue pour simplifier la gestion médicale au quotidien.
+    </p>
+
+    <hr />
+
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">👤 Gestion des Patients</h5>
+                    <p class="card-text">
+                        Consultez la liste complète des patients, accédez aux détails de chacun,
+                        et modifiez ou supprimez les informations les concernant.
+                    </p>
+                    <a class="btn btn-outline-primary" asp-controller="Patient" asp-action="Index">Voir les Patients</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-success">
+                <div class="card-body">
+                    <h5 class="card-title">📝 Suivi des Notes Médicales</h5>
+                    <p class="card-text">
+                        Consultez toutes les notes rédigées pour les patients.
+                        Créez de nouvelles notes et visualisez les informations médicales déjà enregistrées.
+                    </p>
+                    <a class="btn btn-outline-success" asp-controller="Note" asp-action="Index">Voir les Notes</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

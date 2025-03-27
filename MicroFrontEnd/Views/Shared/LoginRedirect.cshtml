@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Redirection vers la Connexion";
+}
+
+<div class="text-center mt-5">
+    <h1 class="display-4">🔒 Connexion requise</h1>
+    <p class="lead">Vous devez être connecté pour accéder à cette fonctionnalité.</p>
+
+    <hr />
+
+    <p>Vous allez être redirigé vers la page de connexion...</p>
+
+    <a class="btn btn-primary mt-3" href="/auth/login">Redirection manuelle</a>
+</div>
+
+@section Scripts {
+    <script>
+        setTimeout(function () {
+            window.location.href = '/auth/login'; // À adapter selon ton système d'auth
+        }, 3000);
+    </script>
+}

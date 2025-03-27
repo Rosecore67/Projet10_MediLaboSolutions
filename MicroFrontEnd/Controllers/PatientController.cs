@@ -1,4 +1,5 @@
 ﻿using MicroFrontEnd.Models;
+using MicroFrontEnd.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
@@ -44,9 +45,22 @@ namespace MicroFrontEnd.Controllers
 
             var data = await response.Content.ReadAsStringAsync();
             var patient = JsonSerializer.Deserialize<PatientDetailsViewModel>(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var notesResponse = await _httpClient.GetAsync($"http://localhost:6000/api/notes/{id}");
+
+            if (notesResponse.IsSuccessStatusCode)
+            {
+                var notesContent = await notesResponse.Content.ReadAsStringAsync();
+                var notes = JsonSerializer.Deserialize<List<NoteDTO>>(notesContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                patient.Notes = notes;
+            }
+            else
+            {
+                patient.Notes = new List<NoteDTO>(); // Pour éviter un null
+            }
 
             return View(patient);
         }
+
         // Permet de récupérer les patients pour une MAJ
         public async Task<IActionResult> Edit(int id)
         {

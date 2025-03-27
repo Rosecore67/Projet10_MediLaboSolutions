@@ -1,0 +1,15 @@
+﻿@model NoteCreateViewModel
+
+<h2>Ajouter une note</h2>
+
+<form asp-action="Create" method="post">
+    <input type="hidden" asp-for="PatientId" />
+
+    <div class="form-group">
+        <label>Contenu de la note :</label>
+        <textarea asp-for="Content" class="form-control" rows="5"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Enregistrer</button>
+    <a asp-action="Details" asp-route-id="@Model.PatientId" class="btn btn-secondary">Annuler</a>
+</form>

@@ -9,4 +9,31 @@
     <tr><th>Adresse</th><td>@Model.Adresse</td></tr>
     <tr><th>Téléphone</th><td>@Model.Telephone</td></tr>
 </table>
+
+<h3>Notes du médecin</h3>
+
+@if (Model.Notes != null && Model.Notes.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Contenu</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var note in Model.Notes)
+            {
+                <tr>
+                    <td>@note.Date.ToShortDateString()</td>
+                    <td>@note.Content</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Aucune note enregistrée pour ce patient.</p>
+}
 <a asp-action="Index">Retour à la liste</a>

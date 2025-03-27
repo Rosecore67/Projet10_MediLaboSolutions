@@ -1,4 +1,6 @@
-﻿namespace MicroFrontEnd.Models
+﻿using MicroFrontEnd.Models.DTOs;
+
+namespace MicroFrontEnd.Models
 {
     public class PatientDetailsViewModel
     {
@@ -9,5 +11,7 @@
         public string Genre { get; set; }
         public string Adresse { get; set; }
         public string Telephone { get; set; }
+
+        public List<NoteDTO>? Notes { get; set; } = new();
     }
 }
