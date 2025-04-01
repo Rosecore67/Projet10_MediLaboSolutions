@@ -38,7 +38,20 @@
         }
       ],
       "UpstreamPathTemplate": "/api/notes",
-      "UpstreamHttpMethod": [ "GET" ,"POST", "PUT" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ]
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/notes/{patientId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7249
+        }
+      ],
+      "UpstreamPathTemplate": "/api/notes/{patientId}",
+      "UpstreamHttpMethod": [ "GET" ]
     }
     
   ],
