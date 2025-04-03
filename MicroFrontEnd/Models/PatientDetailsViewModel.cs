@@ -13,5 +13,6 @@ namespace MicroFrontEnd.Models
         public string Telephone { get; set; }
 
         public List<NoteDTO>? Notes { get; set; } = new();
+        public string NiveauRisque { get; set; }
     }
 }

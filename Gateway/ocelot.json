@@ -52,8 +52,22 @@
       ],
       "UpstreamPathTemplate": "/api/notes/{patientId}",
       "UpstreamHttpMethod": [ "GET" ]
+    },
+
+    //Route DiabeteCheck
+    {
+      "DownstreamPathTemplate": "/api/diabetescheck/{patientId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7025
+        }
+      ],
+      "UpstreamPathTemplate": "/api/diabetescheck/{patientId}",
+      "UpstreamHttpMethod": [ "GET" ]
     }
-    
+
   ],
   "GlobalConfiguration": {
     "BaseUrl": "http://localhost:6000"

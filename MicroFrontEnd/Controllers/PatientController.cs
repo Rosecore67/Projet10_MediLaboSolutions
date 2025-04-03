@@ -58,6 +58,20 @@ namespace MicroFrontEnd.Controllers
                 patient.Notes = new List<NoteDTO>(); // Pour éviter un null
             }
 
+            var riskResponse = await _httpClient.GetAsync($"http://localhost:6000/api/DiabetesCheck/{id}");
+            if (riskResponse.IsSuccessStatusCode)
+            {
+                var riskData = await riskResponse.Content.ReadAsStringAsync();
+                patient.NiveauRisque = JsonSerializer.Deserialize<string>(riskData, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+            else
+            {
+                patient.NiveauRisque = "Non évalué";
+            }
+
             return View(patient);
         }
 
