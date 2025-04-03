@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using NoteService.Repositories;
 using NoteService.Repositories.Interface;
 using NoteService.Services;
@@ -15,6 +17,21 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<NoteDatabaseSettings>(
     builder.Configuration.GetSection("NoteDatabaseSettings"));
+
+builder.Services.AddSingleton<IMongoClient>(serviceProvider =>
+{
+    var noteDbSettings = serviceProvider
+        .GetRequiredService<IOptions<NoteDatabaseSettings>>()
+        .Value;
+    return new MongoClient(noteDbSettings.ConnectionString);
+});
+
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var settings = serviceProvider.GetRequiredService<IOptions<NoteDatabaseSettings>>().Value;
+    var client = serviceProvider.GetRequiredService<IMongoClient>();
+    return client.GetDatabase(settings.DatabaseName);
+});
 
 builder.Services.AddSingleton<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<INoteService, NotesService>();

@@ -10,10 +10,8 @@ namespace NoteService.Repositories
     {
         private readonly IMongoCollection<Note> _notesCollection;
 
-        public NoteRepository(IOptions<NoteDatabaseSettings> noteDbSettings)
+        public NoteRepository(IOptions<NoteDatabaseSettings> noteDbSettings, IMongoDatabase database)
         {
-            var mongoClient = new MongoClient(noteDbSettings.Value.ConnectionString);
-            var database = mongoClient.GetDatabase(noteDbSettings.Value.DatabaseName);
             _notesCollection = database.GetCollection<Note>(noteDbSettings.Value.NotesCollectionName);
         }
 

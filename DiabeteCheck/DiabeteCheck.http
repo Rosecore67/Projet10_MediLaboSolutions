@@ -1,0 +1,6 @@
+@DiabeteCheck_HostAddress = http://localhost:5188
+
+GET {{DiabeteCheck_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
