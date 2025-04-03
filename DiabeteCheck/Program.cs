@@ -1,3 +1,4 @@
+using DiabeteCheck.Services;
 using DiabeteCheck.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);

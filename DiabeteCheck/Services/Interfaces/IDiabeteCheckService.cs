@@ -4,6 +4,6 @@ namespace DiabeteCheck.Services.Interfaces
 {
     public interface IDiabeteCheckService
     {
-        Task<RiskEvaluation> AssessRiskAsync(int patientId);
+        Task<RiskEvaluation> ControlRiskAsync(int patientId);
     }
 }

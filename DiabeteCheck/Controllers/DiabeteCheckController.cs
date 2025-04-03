@@ -4,31 +4,28 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DiabeteCheck.Controllers
 {
-    public class DiabeteCheckController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class DiabetesCheckController : ControllerBase
     {
-        [ApiController]
-        [Route("api/[controller]")]
-        public class DiabetesAssessmentController : ControllerBase
+        private readonly IDiabeteCheckService _riskService;
+
+        public DiabetesCheckController(IDiabeteCheckService riskService)
         {
-            private readonly IDiabeteCheckService _riskService;
+            _riskService = riskService;
+        }
 
-            public DiabetesAssessmentController(IDiabeteCheckService riskService)
+        [HttpGet("{patientId}")]
+        public async Task<ActionResult<RiskEvaluation>> GetRiskLevel(int patientId)
+        {
+            try
             {
-                _riskService = riskService;
+                var risk = await _riskService.ControlRiskAsync(patientId);
+                return Ok(risk);
             }
-
-            [HttpGet("{patientId}")]
-            public async Task<ActionResult<RiskEvaluation>> GetRiskLevel(int patientId)
+            catch (Exception ex)
             {
-                try
-                {
-                    var risk = await _riskService.AssessRiskAsync(patientId);
-                    return Ok(risk);
-                }
-                catch (Exception ex)
-                {
-                    return NotFound(new { message = ex.Message });
-                }
+                return NotFound(new { message = ex.Message });
             }
         }
     }

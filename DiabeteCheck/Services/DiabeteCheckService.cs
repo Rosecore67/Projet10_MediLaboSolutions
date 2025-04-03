@@ -17,7 +17,7 @@ namespace DiabeteCheck.Services
             _configuration = configuration;
         }
 
-        public async Task<RiskEvaluation> AssessRiskAsync(int patientId)
+        public async Task<RiskEvaluation> ControlRiskAsync(int patientId)
         {
             // URLs des autres microservices
             var baseUrl = _configuration["GatewayUrl"];
