@@ -3,22 +3,20 @@ using DiabeteCheck.Models.DTOs;
 using DiabeteCheck.Services.Interfaces;
 using DiabeteCheck.Utils;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace DiabeteCheck.Services
 {
-    public class DiabeteCheckService : IDiabeteCheckService
+    public class DiabeteCheckService(HttpClient httpClient, IConfiguration configuration) : IDiabeteCheckService
     {
-        private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
-
-        public DiabeteCheckService(HttpClient httpClient, IConfiguration configuration)
-        {
-            _httpClient = httpClient;
-            _configuration = configuration;
-        }
+        private readonly HttpClient _httpClient = httpClient;
+        private readonly IConfiguration _configuration = configuration;
 
         public async Task<RiskEvaluation> ControlRiskAsync(int patientId)
         {
+            // Valeur par défaut
+            RiskEvaluation riskLevel = RiskEvaluation.None;
+
             // URLs des autres microservices
             var baseUrl = _configuration["GatewayUrl"];
             var patientUrl = $"{baseUrl}/api/patients/{patientId}";
@@ -40,40 +38,60 @@ namespace DiabeteCheck.Services
             var notesJson = await notesResponse.Content.ReadAsStringAsync();
             var notes = JsonSerializer.Deserialize<List<NoteDTO>>(notesJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            // Compter les déclencheurs
-            int triggerCount = 0;
-            foreach (var note in notes)
+            // Fusionner tout le contenu des notes
+            string allContent = string.Join(" ", notes
+                .Where(n => !string.IsNullOrWhiteSpace(n.Contenu))
+                .Select(n => n.Contenu.ToLowerInvariant()));
+
+            // Liste des déclencheurs uniques détectés
+            var detectedTriggers = new HashSet<string>();
+
+            // Détection des termes (chaque racine ne compte qu'une seule fois)
+            foreach (var kvp in TriggerTerms.TermsWithVariants)
             {
-                foreach (var trigger in TriggerTerms.Terms)
+                foreach (var variant in kvp.Value)
                 {
-                    if (note.Contenu != null && note.Contenu.Contains(trigger, StringComparison.OrdinalIgnoreCase))
+                    var pattern = $@"\b{Regex.Escape(variant)}\b";
+                    if (Regex.IsMatch(allContent, pattern))
                     {
-                        triggerCount++;
+                        detectedTriggers.Add(kvp.Key);
+                        break; // On arrête dès qu'une variante a matché
                     }
                 }
             }
+
+            int triggerCount = detectedTriggers.Count;
 
             // Calcul de l'âge
             int age = DateTime.Today.Year - patient.DateNaissance.Year;
             if (patient.DateNaissance > DateTime.Today.AddYears(-age)) age--;
 
-            // Règles d’évaluation
             if (triggerCount == 0)
-                return RiskEvaluation.None;
-
-            if (triggerCount == 2 && age > 30)
-                return RiskEvaluation.Borderline;
-
-            if ((patient.Genre == "M" && age < 30 && triggerCount >= 3) ||
-                (patient.Genre == "F" && age < 30 && triggerCount >= 4))
-                return RiskEvaluation.InDanger;
-
-            if ((age > 30 && triggerCount >= 6) ||
+            {
+                riskLevel = RiskEvaluation.None;
+            }
+            else if (
                 (patient.Genre == "M" && age < 30 && triggerCount >= 5) ||
-                (patient.Genre == "F" && age < 30 && triggerCount >= 7))
-                return RiskEvaluation.EarlyOnset;
+                (patient.Genre == "F" && age < 30 && triggerCount >= 7) ||
+                (age > 30 && triggerCount >= 8)
+            )
+            {
+                riskLevel = RiskEvaluation.EarlyOnset;
+            }
+            else if (
+                (patient.Genre == "M" && age < 30 && triggerCount >= 3 && triggerCount <= 4) ||
+                (patient.Genre == "F" && age < 30 && triggerCount >= 4 && triggerCount <= 6) ||
+                (age > 30 && (triggerCount == 6 || triggerCount == 7))
+            )
+            {
+                riskLevel = RiskEvaluation.InDanger;
+            }
+            else if (triggerCount >= 2 && triggerCount <= 5 && age > 30)
+            {
+                riskLevel = RiskEvaluation.Borderline;
+            }
 
-            return RiskEvaluation.None;
+            return riskLevel;
         }
     }
 }
