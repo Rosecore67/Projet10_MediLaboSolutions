@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroFrontEnd", "MicroFront
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoteService", "NoteService\NoteService.csproj", "{DACCFF8A-C16F-4A96-B299-5C68F7CAD2A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiabeteCheck", "DiabeteCheck\DiabeteCheck.csproj", "{B8D70065-4F10-40A6-9B8B-43909A5B20BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiabeteCheck", "DiabeteCheck\DiabeteCheck.csproj", "{B8D70065-4F10-40A6-9B8B-43909A5B20BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityAuthService", "IdentityAuthService\IdentityAuthService.csproj", "{3CEDFB01-B43B-4689-909A-1F3C80561404}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{B8D70065-4F10-40A6-9B8B-43909A5B20BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8D70065-4F10-40A6-9B8B-43909A5B20BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8D70065-4F10-40A6-9B8B-43909A5B20BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CEDFB01-B43B-4689-909A-1F3C80561404}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CEDFB01-B43B-4689-909A-1F3C80561404}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CEDFB01-B43B-4689-909A-1F3C80561404}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CEDFB01-B43B-4689-909A-1F3C80561404}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
