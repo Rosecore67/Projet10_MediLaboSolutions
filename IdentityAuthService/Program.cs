@@ -5,30 +5,36 @@ using IdentityAuthService.Service.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configuration binding
 builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
 builder.Services.Configure<AdminCredentials>(builder.Configuration.GetSection("AdminCredentials"));
-
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Important pour que les routes [Route(...)] fonctionnent
+app.UseRouting();
+
+app.Use(async (context, next) =>
+{
+    context.Request.Scheme = "http"; // Facultatif, tu peux probablement le supprimer
+    await next();
+});
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
+// Authz doit venir après Routing
 app.UseAuthorization();
 
+// Active les endpoints des controllers
 app.MapControllers();
 
 app.Run();

@@ -11,8 +11,8 @@ var secretKey = authSettings["SecretKey"];
 var issuer = authSettings["Issuer"];
 var audience = authSettings["Audience"];
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication("Bearer") // <== NOTE : chaîne explicite
+    .AddJwtBearer("Bearer", options => // <== NOTE : nom explicite à nouveau
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -24,6 +24,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine("AUTH FAILED: " + context.Exception.Message);
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("AUTH SUCCESS: " + context.SecurityToken);
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
@@ -31,15 +45,23 @@ builder.Services.AddOcelot();
 
 var app = builder.Build();
 
-app.UseAuthentication();
-app.UseAuthorization();
-
 app.Use(async (context, next) =>
 {
-    var authHeader = context.Request.Headers["Authorization"].ToString();
-    Console.WriteLine("GATEWAY - Authorization header reçu : " + authHeader);
+    Console.WriteLine("---- GATEWAY - HEADERS REÇUS ----");
+    foreach (var header in context.Request.Headers)
+    {
+        Console.WriteLine($"{header.Key}: {header.Value}");
+    }
+    Console.WriteLine("----------------------------------");
+
     await next.Invoke();
 });
+
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 await app.UseOcelot();
 

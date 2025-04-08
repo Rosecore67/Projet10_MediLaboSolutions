@@ -3,11 +3,11 @@
     // ---------------- BackPatient ----------------
     {
       "DownstreamPathTemplate": "/api/patients",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7011
+          "Port": 5136
         }
       ],
       "UpstreamPathTemplate": "/api/patients",
@@ -19,11 +19,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/patients/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7011
+          "Port": 5136
         }
       ],
       "UpstreamPathTemplate": "/api/patients/{id}",
@@ -35,11 +35,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/patients/add",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7011
+          "Port": 5136
         }
       ],
       "UpstreamPathTemplate": "/api/patients/add",
@@ -51,11 +51,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/patients/update/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7011
+          "Port": 5136
         }
       ],
       "UpstreamPathTemplate": "/api/patients/update/{id}",
@@ -67,11 +67,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/patients/delete/{id}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7011
+          "Port": 5136
         }
       ],
       "UpstreamPathTemplate": "/api/patients/delete/{id}",
@@ -85,11 +85,11 @@
     // ---------------- NoteService ----------------
     {
       "DownstreamPathTemplate": "/api/notes",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7249
+          "Port": 5210
         }
       ],
       "UpstreamPathTemplate": "/api/notes",
@@ -101,11 +101,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/notes/{patientId}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7249
+          "Port": 5210
         }
       ],
       "UpstreamPathTemplate": "/api/notes/{patientId}",
@@ -119,11 +119,11 @@
     // ---------------- DiabeteCheck ----------------
     {
       "DownstreamPathTemplate": "/api/diabetescheck/{patientId}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7025
+          "Port": 5188
         }
       ],
       "UpstreamPathTemplate": "/api/diabetescheck/{patientId}",
@@ -137,18 +137,21 @@
     // ---------------- IdentityAuthService ----------------
     {
       "DownstreamPathTemplate": "/api/auth/login",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7027
+          "Port": 5191
         }
       ],
       "UpstreamPathTemplate": "/api/auth/login",
       "UpstreamHttpMethod": [ "POST" ]
     }
   ],
+
+  //-------------- Config ----------
   "GlobalConfiguration": {
     "BaseUrl": "http://localhost:6000"
   }
 }
+ 

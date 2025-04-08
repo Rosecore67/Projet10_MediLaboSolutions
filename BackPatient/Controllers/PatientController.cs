@@ -16,8 +16,7 @@ namespace BackPatient.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Patient>>> GetPatients()
         {
-            var token = Request.Headers["Authorization"].ToString();
-            Console.WriteLine("🩺 TOKEN reçu dans BackPatient : " + token);
+            Console.WriteLine("📥 [API] Appel à GetPatients reçu !");
 
             return Ok(await _service.GetAllPatients());
         }

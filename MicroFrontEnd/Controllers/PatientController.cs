@@ -1,8 +1,8 @@
 ﻿using MicroFrontEnd.Models;
 using MicroFrontEnd.Models.DTOs;
-using MicroFrontEnd.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -13,7 +13,7 @@ namespace MicroFrontEnd.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _accessor;
-        private readonly string _apiUrl = "https://localhost:6000/api/patients";
+        private readonly string _apiUrl = "http://localhost:6000/api/patients";
 
         public PatientController(IHttpClientFactory httpClientFactory, IHttpContextAccessor accessor)
         {
@@ -21,34 +21,40 @@ namespace MicroFrontEnd.Controllers
             _accessor = accessor;
         }
 
+        // 👇 Injecte automatiquement le token depuis la session dans le header
+        private HttpClient CreateClientWithJwt()
+        {
+            var client = _httpClientFactory.CreateClient("LoggedClient");
+            var token = _accessor.HttpContext?.Session.GetString("JwtToken");
+
+            Console.WriteLine($"[CONTROLLER] Token récupéré : {(token?.Substring(0, 15) ?? "AUCUN")}...");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+
+            return client;
+        }
+
         public async Task<IActionResult> Index()
         {
-
-
-            var client = _httpClientFactory.CreateClient();
-            client.AddJwtFromSession(_accessor);
+            Console.WriteLine("🔍 [PatientController] Index appelé !");
+            var client = CreateClientWithJwt();
 
             var response = await client.GetAsync(_apiUrl);
             if (!response.IsSuccessStatusCode)
-            {
                 return View(new List<PatientViewModel>());
-            }
 
             var data = await response.Content.ReadAsStringAsync();
+            var patients = JsonSerializer.Deserialize<List<PatientViewModel>>(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            var patients = JsonSerializer.Deserialize<List<PatientViewModel>>(data, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
-            Console.WriteLine("🎯 Appel de Index");
-            Console.WriteLine("Session JWT dans controller : " + (_accessor.HttpContext?.Session.GetString("JwtToken") ?? "vide"));
             return View(patients);
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            var client = _httpClientFactory.CreateClient();
-            client.AddJwtFromSession(_accessor);
+            var client = CreateClientWithJwt();
 
             var response = await client.GetAsync($"{_apiUrl}/{id}");
             if (!response.IsSuccessStatusCode) return NotFound();
@@ -56,31 +62,24 @@ namespace MicroFrontEnd.Controllers
             var data = await response.Content.ReadAsStringAsync();
             var patient = JsonSerializer.Deserialize<PatientDetailsViewModel>(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            // Get notes
-            var notesUrl = $"https://localhost:6000/api/notes/{id}";
-            var notesResponse = await client.GetAsync(notesUrl);
-
+            // Notes
+            var notesResponse = await client.GetAsync($"http://localhost:6000/api/notes/{id}");
             if (notesResponse.IsSuccessStatusCode)
             {
                 var notesContent = await notesResponse.Content.ReadAsStringAsync();
-                var notes = JsonSerializer.Deserialize<List<NoteDTO>>(notesContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                patient.Notes = notes;
+                patient.Notes = JsonSerializer.Deserialize<List<NoteDTO>>(notesContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
             else
             {
                 patient.Notes = new List<NoteDTO>();
             }
 
-            // Get diabetes risk
-            var riskUrl = $"https://localhost:6000/api/diabetescheck/{id}";
-            var riskResponse = await client.GetAsync(riskUrl);
+            // Risque
+            var riskResponse = await client.GetAsync($"http://localhost:6000/api/diabetescheck/{id}");
             if (riskResponse.IsSuccessStatusCode)
             {
                 var riskData = await riskResponse.Content.ReadAsStringAsync();
-                patient.NiveauRisque = JsonSerializer.Deserialize<string>(riskData, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
+                patient.NiveauRisque = JsonSerializer.Deserialize<string>(riskData, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
             else
             {
@@ -92,8 +91,7 @@ namespace MicroFrontEnd.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            var client = _httpClientFactory.CreateClient();
-            client.AddJwtFromSession(_accessor);
+            var client = CreateClientWithJwt();
 
             var response = await client.GetAsync($"{_apiUrl}/{id}");
             if (!response.IsSuccessStatusCode) return NotFound();
@@ -107,8 +105,7 @@ namespace MicroFrontEnd.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(PatientEditViewModel model)
         {
-            var client = _httpClientFactory.CreateClient();
-            client.AddJwtFromSession(_accessor);
+            var client = CreateClientWithJwt();
 
             var json = JsonSerializer.Serialize(model);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -121,10 +118,9 @@ namespace MicroFrontEnd.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var client = _httpClientFactory.CreateClient();
-            client.AddJwtFromSession(_accessor);
+            var client = CreateClientWithJwt();
 
-            var response = await client.DeleteAsync($"{_apiUrl}/delete/{id}");
+            await client.DeleteAsync($"{_apiUrl}/delete/{id}");
             return RedirectToAction("Index");
         }
     }

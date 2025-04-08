@@ -1,13 +1,13 @@
+using MicroFrontEnd.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddHttpClient();
-// Add services to the container.
+// --- Services MVC / Session ---
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -15,15 +15,17 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddHttpClient();
-
+// --- AuthSettings depuis appsettings.json ---
 var jwtSection = builder.Configuration.GetSection("AuthSettings");
-var secretKey = jwtSection["SecretKey"];
-var issuer = jwtSection["Issuer"];
-var audience = jwtSection["Audience"];
+builder.Services.Configure<AuthSettings>(jwtSection);
+var authSettings = jwtSection.Get<AuthSettings>();
+var secretKey = authSettings?.SecretKey;
+var issuer = authSettings?.Issuer;
+var audience = authSettings?.Audience;
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+// --- Authentification JWT ---
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -35,32 +37,57 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine("AUTH FAILED: " + context.Exception.Message);
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("AUTH SUCCESS: " + context.SecurityToken);
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddHttpContextAccessor();
+
+// --- HttpClient avec ajout automatique du token depuis la session ---
+builder.Services.AddHttpClient("LoggedClient");
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// --- Pipeline ---
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-app.UseSession();
 
+app.Use(async (context, next) =>
+{
+    Console.WriteLine("[MicroFrontEnd] Requête entrante : " + context.Request.Path);
+    await next();
+});
+
+
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Login}/{id?}");
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
 
 app.Run();

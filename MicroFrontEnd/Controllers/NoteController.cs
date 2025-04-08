@@ -1,8 +1,8 @@
 ﻿using MicroFrontEnd.Models;
 using MicroFrontEnd.Models.DTOs;
-using MicroFrontEnd.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
@@ -22,10 +22,25 @@ namespace MicroFrontEnd.Controllers
             _accessor = accessor;
         }
 
+        // 🔐 Centralisation de la logique d'injection du token dans les requêtes
+        private HttpClient CreateClientWithJwt()
+        {
+            var client = _httpClientFactory.CreateClient("LoggedClient");
+            var token = _accessor.HttpContext?.Session.GetString("JwtToken");
+
+            Console.WriteLine($"[NOTE] Token récupéré : {(token?.Substring(0, 15) ?? "AUCUN")}...");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+
+            return client;
+        }
+
         public async Task<IActionResult> Index()
         {
-            var client = _httpClientFactory.CreateClient();
-            client.AddJwtFromSession(_accessor);
+            var client = CreateClientWithJwt();
 
             var noteResponse = await client.GetAsync(_noteApiUrl);
             if (!noteResponse.IsSuccessStatusCode)
@@ -38,8 +53,7 @@ namespace MicroFrontEnd.Controllers
 
             foreach (var note in notes)
             {
-                var patientClient = _httpClientFactory.CreateClient();
-                patientClient.AddJwtFromSession(_accessor);
+                var patientClient = CreateClientWithJwt();
 
                 var patientResponse = await patientClient.GetAsync($"{_patientApiUrl}/{note.PatientId}");
                 var patientName = "Inconnu";
@@ -58,16 +72,10 @@ namespace MicroFrontEnd.Controllers
             return View(result);
         }
 
-        public IActionResult Create(int patientId)
-        {
-            return View(new NoteCreateViewModel { PatientId = patientId });
-        }
-
         [HttpPost]
         public async Task<IActionResult> Create(NoteCreateViewModel model)
         {
-            var client = _httpClientFactory.CreateClient();
-            client.AddJwtFromSession(_accessor);
+            var client = CreateClientWithJwt();
 
             var json = JsonSerializer.Serialize(model);
             var content = new StringContent(json, Encoding.UTF8, "application/json");

@@ -11,12 +11,11 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// MongoDB settings
 builder.Services.Configure<NoteDatabaseSettings>(
     builder.Configuration.GetSection("NoteDatabaseSettings"));
 
@@ -38,6 +37,7 @@ builder.Services.AddSingleton(serviceProvider =>
 builder.Services.AddSingleton<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<INoteService, NotesService>();
 
+// Auth settings
 var jwtSettings = builder.Configuration.GetSection("AuthSettings");
 var secretKey = jwtSettings["SecretKey"];
 var issuer = jwtSettings["Issuer"];
@@ -56,22 +56,42 @@ builder.Services.AddAuthentication("Bearer")
             ValidAudience = audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
         };
+
+        options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine("[AUTH FAIL] Erreur : " + context.Exception.Message);
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine("[AUTH SUCCESS] Token validé pour : " + context.Principal?.Identity?.Name);
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
+app.Use(async (context, next) =>
+{
+    var authHeader = context.Request.Headers["Authorization"].ToString();
+    Console.WriteLine("[Middleware] Authorization header reçu : " + (authHeader ?? "AUCUN"));
+    await next.Invoke();
+});
+
 app.UseAuthorization();
 
 app.MapControllers();
