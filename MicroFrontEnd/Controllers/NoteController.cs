@@ -1,27 +1,35 @@
 ﻿using MicroFrontEnd.Models;
 using MicroFrontEnd.Models.DTOs;
+using MicroFrontEnd.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
 
 namespace MicroFrontEnd.Controllers
 {
+    [Authorize]
     public class NoteController : Controller
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IHttpContextAccessor _accessor;
         private readonly string _noteApiUrl = "http://localhost:6000/api/notes";
         private readonly string _patientApiUrl = "http://localhost:6000/api/patients";
 
-        public NoteController(HttpClient httpClient)
+        public NoteController(IHttpClientFactory httpClientFactory, IHttpContextAccessor accessor)
         {
-            _httpClient = httpClient;
+            _httpClientFactory = httpClientFactory;
+            _accessor = accessor;
         }
 
-        // Affiche toutes les notes avec les noms des patients
         public async Task<IActionResult> Index()
         {
-            var noteResponse = await _httpClient.GetAsync($"{_noteApiUrl}");
-            if (!noteResponse.IsSuccessStatusCode) return View(new List<(NoteDTO, string)>());
+            var client = _httpClientFactory.CreateClient();
+            client.AddJwtFromSession(_accessor);
+
+            var noteResponse = await client.GetAsync(_noteApiUrl);
+            if (!noteResponse.IsSuccessStatusCode)
+                return View(new List<(NoteDTO, string)>());
 
             var noteData = await noteResponse.Content.ReadAsStringAsync();
             var notes = JsonSerializer.Deserialize<List<NoteDTO>>(noteData, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -30,7 +38,10 @@ namespace MicroFrontEnd.Controllers
 
             foreach (var note in notes)
             {
-                var patientResponse = await _httpClient.GetAsync($"{_patientApiUrl}/{note.PatientId}");
+                var patientClient = _httpClientFactory.CreateClient();
+                patientClient.AddJwtFromSession(_accessor);
+
+                var patientResponse = await patientClient.GetAsync($"{_patientApiUrl}/{note.PatientId}");
                 var patientName = "Inconnu";
 
                 if (patientResponse.IsSuccessStatusCode)
@@ -47,20 +58,21 @@ namespace MicroFrontEnd.Controllers
             return View(result);
         }
 
-        // Formulaire de création
         public IActionResult Create(int patientId)
         {
             return View(new NoteCreateViewModel { PatientId = patientId });
         }
 
-        // Traitement du POST
         [HttpPost]
         public async Task<IActionResult> Create(NoteCreateViewModel model)
         {
+            var client = _httpClientFactory.CreateClient();
+            client.AddJwtFromSession(_accessor);
+
             var json = JsonSerializer.Serialize(model);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync($"{_noteApiUrl}", content);
+            var response = await client.PostAsync(_noteApiUrl, content);
             if (!response.IsSuccessStatusCode)
                 return View(model);
 

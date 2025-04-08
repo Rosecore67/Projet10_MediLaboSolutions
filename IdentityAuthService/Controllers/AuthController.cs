@@ -9,10 +9,10 @@ namespace IdentityAuthService.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly AuthSettings _admin;
+        private readonly AdminCredentials _admin;
         private readonly ITokenService _tokenService;
 
-        public AuthController(IOptions<AuthSettings> adminOptions, ITokenService tokenService)
+        public AuthController(IOptions<AdminCredentials> adminOptions, ITokenService tokenService)
         {
             _admin = adminOptions.Value;
             _tokenService = tokenService;

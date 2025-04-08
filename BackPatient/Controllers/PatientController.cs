@@ -1,10 +1,12 @@
 ﻿using BackPatient.Models;
 using BackPatient.Models.DTOs;
 using BackPatient.Service.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BackPatient.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PatientsController(IPatientService service) : ControllerBase
@@ -14,6 +16,9 @@ namespace BackPatient.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Patient>>> GetPatients()
         {
+            var token = Request.Headers["Authorization"].ToString();
+            Console.WriteLine("🩺 TOKEN reçu dans BackPatient : " + token);
+
             return Ok(await _service.GetAllPatients());
         }
 

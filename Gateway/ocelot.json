@@ -1,6 +1,6 @@
 {
   "Routes": [
-    // Route BackPatient API
+    // ---------------- BackPatient ----------------
     {
       "DownstreamPathTemplate": "/api/patients",
       "DownstreamScheme": "https",
@@ -11,9 +11,12 @@
         }
       ],
       "UpstreamPathTemplate": "/api/patients",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
-
     {
       "DownstreamPathTemplate": "/api/patients/{id}",
       "DownstreamScheme": "https",
@@ -24,10 +27,62 @@
         }
       ],
       "UpstreamPathTemplate": "/api/patients/{id}",
-      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ]
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/patients/add",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7011
+        }
+      ],
+      "UpstreamPathTemplate": "/api/patients/add",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/patients/update/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7011
+        }
+      ],
+      "UpstreamPathTemplate": "/api/patients/update/{id}",
+      "UpstreamHttpMethod": [ "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/patients/delete/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7011
+        }
+      ],
+      "UpstreamPathTemplate": "/api/patients/delete/{id}",
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
 
-    //Route Notes Medecins
+    // ---------------- NoteService ----------------
     {
       "DownstreamPathTemplate": "/api/notes",
       "DownstreamScheme": "https",
@@ -38,9 +93,12 @@
         }
       ],
       "UpstreamPathTemplate": "/api/notes",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
-
     {
       "DownstreamPathTemplate": "/api/notes/{patientId}",
       "DownstreamScheme": "https",
@@ -51,10 +109,14 @@
         }
       ],
       "UpstreamPathTemplate": "/api/notes/{patientId}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     },
 
-    //Route DiabeteCheck
+    // ---------------- DiabeteCheck ----------------
     {
       "DownstreamPathTemplate": "/api/diabetescheck/{patientId}",
       "DownstreamScheme": "https",
@@ -65,9 +127,26 @@
         }
       ],
       "UpstreamPathTemplate": "/api/diabetescheck/{patientId}",
-      "UpstreamHttpMethod": [ "GET" ]
-    }
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
 
+    // ---------------- IdentityAuthService ----------------
+    {
+      "DownstreamPathTemplate": "/api/auth/login",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7027
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/login",
+      "UpstreamHttpMethod": [ "POST" ]
+    }
   ],
   "GlobalConfiguration": {
     "BaseUrl": "http://localhost:6000"

@@ -32,6 +32,12 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
+                    @if (Context.Session.GetString("JwtToken") != null)
+                    {
+                        <form asp-controller="Auth" asp-action="Logout" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-link">Se déconnecter</button>
+                        </form>
+                    }
                 </div>
             </div>
         </nav>
