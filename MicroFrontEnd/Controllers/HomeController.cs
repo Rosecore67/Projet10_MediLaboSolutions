@@ -4,7 +4,6 @@ using System.Diagnostics;
 
 namespace MicroFrontEnd.Controllers
 {
-    //[Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

@@ -7,20 +7,24 @@ using System.Text.Json;
 
 namespace MicroFrontEnd.Controllers
 {
-    //[Authorize]
     public class PatientController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _accessor;
-        private readonly string _apiUrl = "http://localhost:6000/api/patients";
+        private readonly string _patientsApiUrl;
+        private readonly string _notesApiUrl;
+        private readonly string _diabetesApiUrl;
 
-        public PatientController(IHttpClientFactory httpClientFactory, IHttpContextAccessor accessor)
+        public PatientController(IHttpClientFactory httpClientFactory, IHttpContextAccessor accessor, IConfiguration config)
         {
             _httpClientFactory = httpClientFactory;
             _accessor = accessor;
+
+            _patientsApiUrl = config["Endpoints:Patients"]!;
+            _notesApiUrl = config["Endpoints:Notes"]!;
+            _diabetesApiUrl = config["Endpoints:DiabetesCheck"]!;
         }
 
-        // 👇 Injecte automatiquement le token depuis la session dans le header
         private HttpClient CreateClientWithJwt()
         {
             var client = _httpClientFactory.CreateClient("LoggedClient");
@@ -41,7 +45,7 @@ namespace MicroFrontEnd.Controllers
             Console.WriteLine("🔍 [PatientController] Index appelé !");
             var client = CreateClientWithJwt();
 
-            var response = await client.GetAsync(_apiUrl);
+            var response = await client.GetAsync(_patientsApiUrl);
             if (!response.IsSuccessStatusCode)
                 return View(new List<PatientViewModel>());
 
@@ -55,14 +59,13 @@ namespace MicroFrontEnd.Controllers
         {
             var client = CreateClientWithJwt();
 
-            var response = await client.GetAsync($"{_apiUrl}/{id}");
+            var response = await client.GetAsync($"{_patientsApiUrl}/{id}");
             if (!response.IsSuccessStatusCode) return NotFound();
 
             var data = await response.Content.ReadAsStringAsync();
             var patient = JsonSerializer.Deserialize<PatientDetailsViewModel>(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            // Notes
-            var notesResponse = await client.GetAsync($"http://localhost:6000/api/notes/{id}");
+            var notesResponse = await client.GetAsync($"{_notesApiUrl}/{id}");
             if (notesResponse.IsSuccessStatusCode)
             {
                 var notesContent = await notesResponse.Content.ReadAsStringAsync();
@@ -73,8 +76,7 @@ namespace MicroFrontEnd.Controllers
                 patient.Notes = new List<NoteDTO>();
             }
 
-            // Risque
-            var riskResponse = await client.GetAsync($"http://localhost:6000/api/diabetescheck/{id}");
+            var riskResponse = await client.GetAsync($"{_diabetesApiUrl}/{id}");
             if (riskResponse.IsSuccessStatusCode)
             {
                 var riskData = await riskResponse.Content.ReadAsStringAsync();
@@ -92,7 +94,7 @@ namespace MicroFrontEnd.Controllers
         {
             var client = CreateClientWithJwt();
 
-            var response = await client.GetAsync($"{_apiUrl}/{id}");
+            var response = await client.GetAsync($"{_patientsApiUrl}/{id}");
             if (!response.IsSuccessStatusCode) return NotFound();
 
             var data = await response.Content.ReadAsStringAsync();
@@ -109,7 +111,7 @@ namespace MicroFrontEnd.Controllers
             var json = JsonSerializer.Serialize(model);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await client.PutAsync($"{_apiUrl}/update/{model.Id}", content);
+            var response = await client.PutAsync($"{_patientsApiUrl}/update/{model.Id}", content);
             if (!response.IsSuccessStatusCode) return View(model);
 
             return RedirectToAction("Index");
@@ -119,7 +121,7 @@ namespace MicroFrontEnd.Controllers
         {
             var client = CreateClientWithJwt();
 
-            await client.DeleteAsync($"{_apiUrl}/delete/{id}");
+            await client.DeleteAsync($"{_patientsApiUrl}/delete/{id}");
             return RedirectToAction("Index");
         }
     }

@@ -1,0 +1,121 @@
+version: '3.9'
+
+services:
+
+  # --- SQL Server ---
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - SA_PASSWORD=Your_strong_password123!
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    networks:
+      - medilabo-net
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  # --- MongoDB for Notes ---
+  mongo:
+    image: mongo:6.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - medilabo-net
+    volumes:
+      - mongo_data:/data/db
+
+  # --- BackPatient Service ---
+  backpatient:
+    build:
+      context: ./BackPatient
+    container_name: backpatient
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MedilaboPatientsDb;User Id=sa;Password=Your_strong_password123!
+    depends_on:
+      - sqlserver
+    networks:
+      - medilabo-net
+    ports:
+      - "5136:80"
+
+  # --- NoteService (MongoDB) ---
+  noteservice:
+    build:
+      context: ./NoteService
+    container_name: noteservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - NoteDatabaseSettings__ConnectionString=mongodb://mongo:27017
+      - NoteDatabaseSettings__DatabaseName=MedilaboNotesDb
+      - NoteDatabaseSettings__NotesCollectionName=Notes
+    depends_on:
+      - mongo
+    networks:
+      - medilabo-net
+    ports:
+      - "5210:80"
+
+  # --- DiabeteCheck Service ---
+  diabetecheck:
+    build:
+      context: ./DiabeteCheck
+    container_name: diabetecheck
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    networks:
+      - medilabo-net
+    ports:
+      - "5188:80"
+
+  # --- IdentityAuthService ---
+  identityauthservice:
+    build:
+      context: ./IdentityAuthService
+    container_name: identityauthservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    networks:
+      - medilabo-net
+    ports:
+      - "5191:80"
+
+  # --- MicroFrontEnd (MVC) ---
+  microfrontend:
+    build:
+      context: ./MicroFrontEnd
+    container_name: microfrontend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    networks:
+      - medilabo-net
+    ports:
+      - "5055:80"
+
+  # --- Gateway API (Ocelot) ---
+  gateway-api:
+    build:
+      context: ./Gateway
+    container_name: gateway-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    depends_on:
+      - backpatient
+      - noteservice
+      - diabetecheck
+      - identityauthservice
+    ports:
+      - "6000:80"
+    networks:
+      - medilabo-net
+
+networks:
+  medilabo-net:
+    driver: bridge
+
+volumes:
+  sql_data:
+  mongo_data:

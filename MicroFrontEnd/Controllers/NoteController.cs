@@ -7,21 +7,21 @@ using System.Text.Json;
 
 namespace MicroFrontEnd.Controllers
 {
-    //[Authorize]
     public class NoteController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _accessor;
-        private readonly string _noteApiUrl = "http://localhost:6000/api/notes";
-        private readonly string _patientApiUrl = "http://localhost:6000/api/patients";
+        private readonly string _noteApiUrl;
+        private readonly string _patientApiUrl;
 
-        public NoteController(IHttpClientFactory httpClientFactory, IHttpContextAccessor accessor)
+        public NoteController(IHttpClientFactory httpClientFactory, IHttpContextAccessor accessor, IConfiguration config)
         {
             _httpClientFactory = httpClientFactory;
             _accessor = accessor;
+            _noteApiUrl = config["Endpoints:Notes"]!;
+            _patientApiUrl = config["Endpoints:Patients"]!;
         }
 
-        // 🔐 Centralisation de la logique d'injection du token dans les requêtes
         private HttpClient CreateClientWithJwt()
         {
             var client = _httpClientFactory.CreateClient("LoggedClient");
@@ -53,7 +53,6 @@ namespace MicroFrontEnd.Controllers
             foreach (var note in notes)
             {
                 var patientClient = CreateClientWithJwt();
-
                 var patientResponse = await patientClient.GetAsync($"{_patientApiUrl}/{note.PatientId}");
                 var patientName = "Inconnu";
 
@@ -61,7 +60,6 @@ namespace MicroFrontEnd.Controllers
                 {
                     var patientJson = await patientResponse.Content.ReadAsStringAsync();
                     var patient = JsonSerializer.Deserialize<PatientViewModel>(patientJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
                     patientName = $"{patient.Prenom} {patient.Nom}";
                 }
 
