@@ -19,12 +19,6 @@ var app = builder.Build();
 // Important pour que les routes [Route(...)] fonctionnent
 app.UseRouting();
 
-app.Use(async (context, next) =>
-{
-    context.Request.Scheme = "http"; // Facultatif, tu peux probablement le supprimer
-    await next();
-});
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

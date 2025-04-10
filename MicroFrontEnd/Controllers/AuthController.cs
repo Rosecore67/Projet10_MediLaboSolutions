@@ -16,6 +16,7 @@ namespace MicroFrontEnd.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
@@ -45,6 +46,7 @@ namespace MicroFrontEnd.Controllers
             {
                 HttpContext.Session.SetString("JwtToken", token);
                 Console.WriteLine($"[AUTH] Token mis en session : {token}");
+                await HttpContext.Session.CommitAsync();
             }
             else
             {

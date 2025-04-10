@@ -18,15 +18,16 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient<IDiabeteCheckService, DiabeteCheckService>();
 
+builder.Services.AddHttpContextAccessor();
+
 // AuthSettings JWT
 var jwtSettings = builder.Configuration.GetSection("AuthSettings");
 var secretKey = jwtSettings["SecretKey"];
 var issuer = jwtSettings["Issuer"];
 var audience = jwtSettings["Audience"];
 
-// Auth explicite avec schéma "Bearer"
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -65,13 +66,6 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseAuthentication();
-
-app.Use(async (context, next) =>
-{
-    var authHeader = context.Request.Headers["Authorization"].ToString();
-    Console.WriteLine("[Middleware] Authorization header reçu : " + (authHeader ?? "AUCUN"));
-    await next.Invoke();
-});
 
 app.UseAuthorization();
 

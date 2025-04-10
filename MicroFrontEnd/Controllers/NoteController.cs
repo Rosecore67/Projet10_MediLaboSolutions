@@ -1,6 +1,5 @@
 ﻿using MicroFrontEnd.Models;
 using MicroFrontEnd.Models.DTOs;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Text;
@@ -8,7 +7,7 @@ using System.Text.Json;
 
 namespace MicroFrontEnd.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class NoteController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;

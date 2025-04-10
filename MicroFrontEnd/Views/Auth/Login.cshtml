@@ -7,6 +7,7 @@
 <h2>Connexion</h2>
 
 <form asp-action="Login" asp-controller="Auth" method="post">
+    @Html.AntiForgeryToken()
     <div class="form-group">
         <label asp-for="Username"></label>
         <input asp-for="Username" class="form-control" />

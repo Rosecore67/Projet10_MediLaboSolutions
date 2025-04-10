@@ -11,8 +11,8 @@ var secretKey = authSettings["SecretKey"];
 var issuer = authSettings["Issuer"];
 var audience = authSettings["Audience"];
 
-builder.Services.AddAuthentication("Bearer") // <== NOTE : chaîne explicite
-    .AddJwtBearer("Bearer", options => // <== NOTE : nom explicite à nouveau
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -22,19 +22,19 @@ builder.Services.AddAuthentication("Bearer") // <== NOTE : chaîne explicite
             ValidateIssuerSigningKey = true,
             ValidIssuer = issuer,
             ValidAudience = audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!))
         };
 
         options.Events = new JwtBearerEvents
         {
             OnAuthenticationFailed = context =>
             {
-                Console.WriteLine("AUTH FAILED: " + context.Exception.Message);
+                Console.WriteLine("[AUTH FAIL] Erreur : " + context.Exception.Message);
                 return Task.CompletedTask;
             },
             OnTokenValidated = context =>
             {
-                Console.WriteLine("AUTH SUCCESS: " + context.SecurityToken);
+                Console.WriteLine("[AUTH SUCCESS] Token validé pour : " + context.Principal?.Identity?.Name);
                 return Task.CompletedTask;
             }
         };

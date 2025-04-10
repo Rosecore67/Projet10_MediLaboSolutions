@@ -6,7 +6,8 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // --- Services MVC / Session ---
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddSessionStateTempDataProvider();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession(options =>
 {
@@ -24,8 +25,8 @@ var issuer = authSettings?.Issuer;
 var audience = authSettings?.Audience;
 
 // --- Authentification JWT ---
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -42,12 +43,12 @@ builder.Services.AddAuthentication("Bearer")
         {
             OnAuthenticationFailed = context =>
             {
-                Console.WriteLine("AUTH FAILED: " + context.Exception.Message);
+                Console.WriteLine("[AUTH FAIL] Erreur : " + context.Exception.Message);
                 return Task.CompletedTask;
             },
             OnTokenValidated = context =>
             {
-                Console.WriteLine("AUTH SUCCESS: " + context.SecurityToken);
+                Console.WriteLine("[AUTH SUCCESS] Token validé pour : " + context.Principal?.Identity?.Name);
                 return Task.CompletedTask;
             }
         };
@@ -70,16 +71,38 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseRouting();
 
-app.Use(async (context, next) =>
-{
-    Console.WriteLine("[MicroFrontEnd] Requête entrante : " + context.Request.Path);
-    await next();
-});
-
-
 app.UseSession();
+
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value?.ToLower() ?? "";
+    var method = context.Request.Method.ToUpperInvariant();
+    var token = context.Session.GetString("JwtToken");
+
+    // On autorise les chemins suivants même sans token
+    var isAllowedPath =
+        path.StartsWith("/auth") ||
+        path.StartsWith("/css") ||
+        path.StartsWith("/js") ||
+        path.StartsWith("/lib") ||
+        path.StartsWith("/images") ||
+        path.StartsWith("/favicon");
+
+    var isGetRequest = method == "GET";
+
+    if (string.IsNullOrEmpty(token) && !isAllowedPath && isGetRequest)
+    {
+        Console.WriteLine($"[AUTH MIDDLEWARE] Redirection vers /Auth/Login – Path bloqué : {path}");
+        context.Response.Redirect("/Auth/Login");
+        return;
+    }
+
+    await next();
+});
 
 app.MapControllerRoute(
     name: "default",
