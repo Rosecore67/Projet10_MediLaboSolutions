@@ -32,7 +32,7 @@ services:
     container_name: backpatient
     environment:
       - ASPNETCORE_ENVIRONMENT=Docker
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MedilaboPatientsDb;User Id=sa;Password=Your_strong_password123!
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=MedilaboPatientsDb;User Id=sa;Password=Your_strong_password123!;Encrypt=False;TrustServerCertificate=True;
     depends_on:
       - sqlserver
     networks:

@@ -21,6 +21,7 @@ namespace IdentityAuthService.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] UserLoginModel login)
         {
+            Console.WriteLine("Test LOGIN");
             if (login.Username != _admin.Username || login.Password != _admin.Password)
                 return Unauthorized(new { message = "Identifiants invalides" });
 

@@ -64,6 +64,19 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+// --- Appliquer les migrations et initialiser la BDD ---
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<PatientDbContext>();
+
+    Console.WriteLine("Applying migrations...");
+    context.Database.Migrate();
+
+    Console.WriteLine("Seeding data...");
+    DbInitializer.Initialize(context);
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -18,8 +18,8 @@ namespace MicroFrontEnd.Controllers
         {
             _httpClientFactory = httpClientFactory;
             _accessor = accessor;
-            _noteApiUrl = config["Endpoints:Notes"]!;
-            _patientApiUrl = config["Endpoints:Patients"]!;
+            _noteApiUrl = config["ApiUrls:Notes"]!;
+            _patientApiUrl = config["ApiUrls:Patients"]!;
         }
 
         private HttpClient CreateClientWithJwt()

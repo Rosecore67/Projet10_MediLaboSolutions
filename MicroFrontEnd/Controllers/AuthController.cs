@@ -5,9 +5,16 @@ using System.Text.Json;
 
 namespace MicroFrontEnd.Controllers
 {
-    public class AuthController(IHttpClientFactory httpClientFactory) : Controller
+    public class AuthController : Controller
     {
-        private readonly HttpClient _httpClient = httpClientFactory.CreateClient();
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly string _authUrl;
+
+        public AuthController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        {
+            _httpClientFactory = httpClientFactory;
+            _authUrl = configuration["ApiUrls:Auth"] ?? throw new ArgumentNullException("ApiUrls:Auth is not configured");
+        }
 
         [HttpGet]
         public IActionResult Login()
@@ -20,9 +27,7 @@ namespace MicroFrontEnd.Controllers
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             var jsonContent = new StringContent(
                 JsonSerializer.Serialize(new { model.Username, model.Password }),
@@ -30,30 +35,42 @@ namespace MicroFrontEnd.Controllers
                 "application/json"
             );
 
-            var response = await _httpClient.PostAsync("http://localhost:6000/api/auth/login", jsonContent);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                model.ErrorMessage = "Identifiants incorrects.";
+                var client = _httpClientFactory.CreateClient();
+                var response = await client.PostAsync($"{_authUrl}/login", jsonContent);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    model.ErrorMessage = "Identifiants incorrects.";
+                    return View(model);
+                }
+
+                var responseString = await response.Content.ReadAsStringAsync();
+                var jsonDoc = JsonDocument.Parse(responseString);
+                var token = jsonDoc.RootElement.GetProperty("token").GetString();
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    HttpContext.Session.SetString("JwtToken", token);
+                    Console.WriteLine($"[AUTH] Token mis en session : {token}");
+                    await HttpContext.Session.CommitAsync();
+                }
+                else
+                {
+                    Console.WriteLine("[AUTH] Token NULL ou vide !");
+                    model.ErrorMessage = "Erreur lors de la récupération du token.";
+                    return View(model);
+                }
+
+                return RedirectToAction("Index", "Patient");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AUTH ERROR] {ex.Message}");
+                model.ErrorMessage = "Une erreur est survenue lors de la connexion.";
                 return View(model);
             }
-
-            var responseString = await response.Content.ReadAsStringAsync();
-            var jsonDoc = JsonDocument.Parse(responseString);
-            var token = jsonDoc.RootElement.GetProperty("token").GetString();
-
-            if (!string.IsNullOrEmpty(token))
-            {
-                HttpContext.Session.SetString("JwtToken", token);
-                Console.WriteLine($"[AUTH] Token mis en session : {token}");
-                await HttpContext.Session.CommitAsync();
-            }
-            else
-            {
-                Console.WriteLine("[AUTH] Token NULL ou vide !");
-            }
-
-            return RedirectToAction("Index", "Patient");
         }
 
         [HttpPost]
