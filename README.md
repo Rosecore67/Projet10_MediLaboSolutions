@@ -108,6 +108,26 @@ ValidateIssuerSigningKey = true;
 
 ---
 
+## 🌱 Approche Green Code
+
+Le projet **MediLaboSolutions** intègre plusieurs bonnes pratiques du Green Code afin de favoriser un développement responsable et durable :
+
+- **Optimisation du stockage des données** :  
+  Les bases SQL et NoSQL sont conçues pour ne stocker que les données essentielles. Les patients sont normalisés en 3NF, et les notes médicales n'enregistrent que les informations utiles au diagnostic.
+
+- **Réduction des appels inutiles** :  
+  L'application utilise un front centralisé et un système d'authentification JWT pour éviter les appels redondants vers les API. Les requêtes sont uniquement déclenchées si l'utilisateur est authentifié.
+
+- **Déploiement containerisé et léger** :  
+  Chaque microservice est isolé dans un conteneur Docker, ce qui permet une gestion fine des ressources et une meilleure scalabilité. Cela limite la consommation énergétique inutile.
+
+- **Responsabilité de traitement répartie** :  
+  Chaque microservice est spécialisé et indépendant (principe du SRP), ce qui permet de ne faire tourner que les composants nécessaires, sans surcharger inutilement le système.
+
+---
+
+
+
 ## 🎓 Projet à but pédagogique
 Ce projet a été réalisé dans le cadre d'un exercice de formation.
 L'objectif est de montrer :
