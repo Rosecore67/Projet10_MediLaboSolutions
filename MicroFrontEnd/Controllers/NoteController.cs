@@ -69,6 +69,17 @@ namespace MicroFrontEnd.Controllers
             return View(result);
         }
 
+        [HttpGet]
+        public IActionResult Create(int patientId)
+        {
+            var model = new NoteCreateViewModel
+            {
+                PatientId = patientId
+            };
+
+            return View(model);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(NoteCreateViewModel model)
         {
