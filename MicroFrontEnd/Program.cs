@@ -9,7 +9,6 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
 
-// --- Services MVC / Session ---
 builder.Services.AddControllersWithViews()
     .AddSessionStateTempDataProvider();
 builder.Services.AddHttpContextAccessor();
@@ -20,7 +19,6 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// --- AuthSettings depuis appsettings.json ---
 var jwtSection = builder.Configuration.GetSection("AuthSettings");
 builder.Services.Configure<AuthSettings>(jwtSection);
 var authSettings = jwtSection.Get<AuthSettings>();
@@ -28,7 +26,6 @@ var secretKey = authSettings?.SecretKey;
 var issuer = authSettings?.Issuer;
 var audience = authSettings?.Audience;
 
-// --- Authentification JWT ---
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -60,12 +57,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// --- HttpClient avec ajout automatique du token depuis la session ---
 builder.Services.AddHttpClient("LoggedClient");
 
 var app = builder.Build();
 
-// --- Pipeline ---
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

@@ -21,7 +21,6 @@ namespace DiabeteCheck.Services
 
             var triggerCount = CalculateRisk(notes);
 
-            // Calcul de l'âge
             int age = DateTime.Today.Year - patient.DateNaissance.Year;
 
             return EvaluateRisk(triggerCount, age, patient);
