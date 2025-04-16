@@ -70,10 +70,17 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<PatientDbContext>();
 
-    Console.WriteLine("Applying migrations...");
-    context.Database.Migrate();
+    if (context.Database.GetPendingMigrations().Any())
+    {
+        Console.WriteLine("Applying pending migrations...");
+        context.Database.Migrate();
+    }
+    else
+    {
+        Console.WriteLine("No migrations needed. Skipping apply.");
+    }
 
-    Console.WriteLine("Seeding data...");
+    Console.WriteLine("Seeding patients if empty...");
     DbInitializer.Initialize(context);
 }
 
